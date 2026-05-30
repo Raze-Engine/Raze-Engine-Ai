@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USPS Address Abbreviations Lookup</title>
+    
+    <link rel="manifest" href="manifest.json">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AddrAbbr">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/9131/9131546.png">
+    
+    <meta name="theme-color" content="#0969da">
+
+    <style>
+        :root {
+            --bg-color: #f6f8fa;
+            --card-bg: #ffffff;
+            --border-color: #d0d7de;
+            --text-color: #24292f;
+            --text-muted: #57606a;
+            --primary-blue: #0969da;
+            --hover-bg: #f3f4f6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+            /* Prevents rubber-banding bounce on iOS */
+            overscroll-behavior-y: contain; 
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .search-container {
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-color);
+            padding: 10px 0 20px 0;
+            z-index: 100;
+        }
+
+        .search-wrapper {
+            display: flex;
+            gap: 8px;
+            max-width: 500px;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 8px 12px;
+            font-size: 16px; /* 16px prevents automatic zoom on iOS Safari */
+            line-height: 20px;
+            color: var(--text-color);
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-shadow: inset 0 1px 0 rgba(208,215,222,0.2);
+            transition: border-color 0.2s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+
+        .clear-btn {
+            padding: 5px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 20px;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .clear-btn:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .group-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .group-header {
+            background-color: var(--bg-color);
+            padding: 12px 16px;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .counter {
+            background-color: var(--border-color);
+            color: var(--text-color);
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .list-container {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+            overflow-y: auto;
+            max-height: 400px;
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 16px;
+            font-size: 13px;
+            border-bottom: 1px solid #f0f1f2;
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .full-name {
+            color: var(--text-color);
+        }
+
+        .abbreviation {
+            font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+            font-weight: 600;
+            color: var(--primary-blue);
+            background-color: rgba(9,105,218,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .no-results {
+            padding: 16px;
+            color: var(--text-muted);
+            text-align: center;
+            font-size: 13px;
+            display: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Address Component Abbreviations</h1>
+        <p class="subtitle">Quick-reference tool for Street Suffixes, Secondary Units, States, and Directionals</p>
+    </header>
+
+    <div class="search-container">
+        <div class="search-wrapper">
+            <input type="text" id="searchBar" placeholder="Search name or abbreviation..." autocomplete="off">
+            <button class="clear-btn" id="clearBtn">Clear</button>
+        </div>
+    </div>
+
+    <div class="grid-layout">
+        <div class="group-card" id="group-suffixes">
+            <div class="group-header">
+                <span>1. Street Suffixes</span>
+                <span class="counter" id="count-suffixes">0</span>
+            </div>
+            <ul class="list-container" id="list-suffixes"></ul>
+            <div class="no-results">No matching suffixes found</div>
+        </div>
+
+        <div class="group-card" id="group-secondary">
+            <div class="group-header">
+                <span>2. Secondary Units</span>
+                <span class="counter" id="count-secondary">0</span>
+            </div>
+            <ul class="list-container" id="list-secondary"></ul>
+            <div class="no-results">No matching units found</div>
+        </div>
+
+        <div class="group-card" id="group-states">
+            <div class="group-header">
+                <span>3. States & Territories</span>
+                <span class="counter" id="count-states">0</span>
+            </div>
+            <ul class="list-container" id="list-states"></ul>
+            <div class="no-results">No matching states found</div>
+        </div>
+
+        <div class="group-card" id="group-directionals">
+            <div class="group-header">
+                <span>4. Directionals</span>
+                <span class="counter" id="count-directionals">0</span>
+            </div>
+            <ul class="list-container" id="list-directionals"></ul>
+            <div class="no-results">No matching directionals found</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const datasets = {
+        suffixes: [
+            ["Alley", "ALY"], ["Annex", "ANX"], ["Arcade", "ARC"], ["Avenue", "AVE"], ["Bayou", "BYU"],
+            ["Beach", "BCH"], ["Bend", "BND"], ["Bluff", "BLF"], ["Bluffs", "BLFS"], ["Bottom", "BTM"],
+            ["Boulevard", "BLVD"], ["Branch", "BR"], ["Bridge", "BRG"], ["Brook", "BRK"], ["Brooks", "BRKS"],
+            ["Burg", "BG"], ["Burgs", "BGS"], ["Bypass", "BYP"], ["Camp", "CP"], ["Canyon", "CYN"],
+            ["Cape", "CPE"], ["Causeway", "CSWY"], ["Center", "CTR"], ["Centers", "CTRS"], ["Circle", "CIR"],
+            ["Circles", "CIRS"], ["Cliff", "CLF"], ["Cliffs", "CLFS"], ["Club", "CLB"], ["Common", "CMN"],
+            ["Commons", "CMNS"], ["Corner", "COR"], ["Corners", "CORS"], ["Course", "CRSE"], ["Court", "CT"],
+            ["Courts", "CTS"], ["Cove", "CV"], ["Coves", "CVS"], ["Creek", "CRK"], ["Crescent", "CRES"],
+            ["Crest", "CRST"], ["Crossing", "XING"], ["Crossroad", "XRD"], ["Crossroads", "XRDS"], ["Curve", "CURV"],
+            ["Dale", "DLE"], ["Dam", "DM"], ["Divide", "DV"], ["Drive", "DR"], ["Drives", "DRS"],
+            ["Estate", "EST"], ["Estates", "ESTS"], ["Expressway", "EXPY"], ["Extension", "EXT"], ["Extensions", "EXTS"],
+            ["Fall", "FALL"], ["Falls", "FLS"], ["Ferry", "FRY"], ["Field", "FLD"], ["Fields", "FLDS"],
+            ["Flat", "FLT"], ["Flats", "FLTS"], ["Ford", "FRD"], ["Fords", "FRDS"], ["Forest", "FRST"],
+            ["Forge", "FRG"], ["Forges", "FRGS"], ["Fork", "FRK"], ["Forks", "FRKS"], ["Fort", "FT"],
+            ["Freeway", "FWY"], ["Garden", "GDN"], ["Gardens", "GDNS"], ["Gateway", "GTWY"], ["Glen", "GLN"],
+            ["Glens", "GLNS"], ["Green", "GRN"], ["Greens", "GRNS"], ["Grove", "GRV"], ["Groves", "GRVS"],
+            ["Harbor", "HBR"], ["Harbors", "HBRS"], ["Haven", "HVN"], ["Heights", "HTS"], ["Highway", "HWY"],
+            ["Hill", "HL"], ["Hills", "HLS"], ["Hollow", "HOLW"], ["Inlet", "INLT"], ["Island", "IS"],
+            ["Islands", "ISS"], ["Isle", "ISLE"], ["Junction", "JCT"], ["Junctions", "JCTS"], ["Key", "KY"],
+            ["Keys", "KYS"], ["Knoll", "KNL"], ["Knolls", "KNLS"], ["Lake", "LK"], ["Lakes", "LKS"],
+            ["Land", "LAND"], ["Landing", "LNDG"], ["Lane", "LN"], ["Light", "LGT"], ["Lights", "LGTS"],
+            ["Loaf", "LF"], ["Lock", "LCK"], ["Locks", "LCKS"], ["Lodge", "LDG"], ["Loop", "LOOP"],
+            ["Mall", "MALL"], ["Manor", "MNR"], ["Manors", "MNRS"], ["Meadow", "MDW"], ["Meadows", "MDWS"],
+            ["Mews", "MEWS"], ["Mill", "ML"], ["Mills", "MLS"], ["Mission", "MSN"], ["Motorway", "MTWY"],
+            ["Mount", "MT"], ["Mountain", "MTN"], ["Mountains", "MTNS"], ["Neck", "NCK"], ["Orchard", "ORCH"],
+            ["Oval", "OVAL"], ["Overpass", "OPAS"], ["Park", "PARK"], ["Parkway", "PKWY"], ["Parkways", "PKWYS"],
+            ["Pass", "PASS"], ["Passage", "PSGE"], ["Path", "PATH"], ["Pike", "PIKE"], ["Pine", "PNE"],
+            ["Pines", "PNES"], ["Place", "PL"], ["Plain", "PLN"], ["Plains", "PLNS"], ["Plaza", "PLZ"],
+            ["Point", "PT"], ["Points", "PTS"], ["Port", "PRT"], ["Ports", "PRTS"], ["Prairie", "PR"],
+            ["Radial", "RADL"], ["Ramp", "RAMP"], ["Ranch", "RNCH"], ["Rapid", "RPD"], ["Rapids", "RPDS"],
+            ["Rest", "RST"], ["Ridge", "RDG"], ["Ridges", "RDGS"], ["River", "RVR"], ["Road", "RD"],
+            ["Roads", "RDS"], ["Route", "RTE"], ["Row", "ROW"], ["Rue", "RUE"], ["Run", "RUN"],
+            ["Shoal", "SHL"], ["Shoals", "SHLS"], ["Shore", "SHR"], ["Shores", "SHRS"], ["Skyline", "SKLY"],
+            ["Spring", "SPG"], ["Springs", "SPGS"], ["Spur", "SPUR"], ["Spurs", "SPUR"], ["Square", "SQ"],
+            ["Squares", "SQS"], ["Station", "STA"], ["Stravenue", "STRV"], ["Stream", "STRM"], ["Street", "ST"],
+            ["Streets", "STS"], ["Summit", "SMT"], ["Terrace", "TER"], ["Throughway", "TRWY"], ["Trace", "TRCE"],
+            ["Track", "TRAK"], ["Trafficway", "TRFY"], ["Trail", "TRL"], ["Trailer", "TRLR"], ["Tunnel", "TUNL"],
+            ["Turnpike", "TPKE"], ["Underpass", "UPAS"], ["Union", "UN"], ["Unions", "UNS"], ["Valley", "VLY"],
+            ["Valleys", "VLYS"], ["Viaduct", "VIA"], ["View", "VW"], ["Views", "VWS"], ["Village", "VLG"],
+            ["Villages", "VLGS"], ["Ville", "VL"], ["Vista", "VST"], ["Walk", "WALK"], ["Walks", "WALK"],
+            ["Way", "WAY"], ["Ways", "WAYS"], ["Well", "WL"], ["Wells", "WLS"]
+        ],
+        secondary: [
+            ["Apartment", "APT"], ["Building", "BLDG"], ["Basement", "BSMT"], ["Department", "DEPT"],
+            ["Floor", "FL"], ["Front", "FRNT"], ["Hangar", "HNGR"], ["Key", "KEY"], ["Lobby", "LBBY"],
+            ["Lot", "LOT"], ["Lower", "LOWR"], ["Office", "OFC"], ["Penthouse", "PH"], ["Pier", "PIER"],
+            ["Rear", "REAR"], ["Room", "RM"], ["Side", "SIDE"], ["Slip", "SLIP"], ["Space", "SPC"],
+            ["Stop", "STOP"], ["Suite", "STE"], ["Trailer", "TRLR"], ["Unit", "UNIT"], ["Upper", "UPPR"]
+        ],
+        states: [
+            ["Alabama", "AL"], ["Alaska", "AK"], ["Arizona", "AZ"], ["Arkansas", "AR"], ["California", "CA"],
+            ["Colorado", "CO"], ["Connecticut", "CT"], ["Delaware", "DE"], ["District of Columbia", "DC"],
+            ["Florida", "FL"], ["Georgia", "GA"], ["Hawaii", "HI"], ["Idaho", "ID"], ["Illinois", "IL"],
+            ["Indiana", "IN"], ["Iowa", "IA"], ["Kansas", "KS"], ["Kentucky", "KY"], ["Louisiana", "LA"],
+            ["Maine", "ME"], ["Maryland", "MD"], ["Massachusetts", "MA"], ["Michigan", "MI"], ["Minnesota", "MN"],
+            ["Mississippi", "MS"], ["Missouri", "MO"], ["Montana", "MT"], ["Nebraska", "NE"], ["Nevada", "NV"],
+            ["New Hampshire", "NH"], ["New Jersey", "NJ"], ["New Mexico", "NM"], ["New York", "NY"],
+            ["North Carolina", "NC"], ["North Dakota", "ND"], ["Ohio", "OH"], ["Oklahoma", "OK"],
+            ["Oregon", "OR"], ["Pennsylvania", "PA"], ["Rhode Island", "RI"], ["South Carolina", "SC"],
+            ["South Dakota", "SD"], ["Tennessee", "TN"], ["Texas", "TX"], ["Utah", "UT"], ["Vermont", "VT"],
+            ["Virginia", "VA"], ["Washington", "WA"], ["West Virginia", "WV"], ["Wisconsin", "WI"],
+            ["Wyoming", "WY"], ["American Samoa", "AS"], ["Federated States of Micronesia", "FM"],
+            ["Guam", "GU"], ["Marshall Islands", "MH"], ["Northern Mariana Islands", "MP"], ["Palau", "PW"],
+            ["Puerto Rico", "PR"], ["Virgin Islands", "VI"], ["Armed Forces Americas", "AA"],
+            ["Armed Forces Europe", "AE"], ["Armed Forces Pacific", "AP"]
+        ],
+        directionals: [
+            ["North", "N"], ["East", "E"], ["South", "S"], ["West", "W"],
+            ["Northeast", "NE"], ["Southeast", "SE"], ["Northwest", "NW"], ["Southwest", "SW"]
+        ]
+    };
+
+    function initLists() {
+        for (const [key, items] of Object.entries(datasets)) {
+            const ul = document.getElementById(`list-${key}`);
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'list-item';
+                li.setAttribute('data-name', item[0].toLowerCase());
+                li.setAttribute('data-abbr', item[1].toLowerCase());
+                
+                li.innerHTML = `
+                    <span class="full-name">${item[0]}</span>
+                    <span class="abbreviation">${item[1]}</span>
+                `;
+                ul.appendChild(li);
+            });
+        }
+        updateCounters();
+    }
+
+    function filterLists() {
+        const query = document.getElementById('searchBar').value.toLowerCase().trim();
+
+        for (const key of Object.keys(datasets)) {
+            const container = document.getElementById(`list-${key}`);
+            const items = container.getElementsByClassName('list-item');
+            const noResultsMessage = container.nextElementSibling;
+            let visibleCount = 0;
+
+            for (let item of items) {
+                const name = item.getAttribute('data-name');
+                const abbr = item.getAttribute('data-abbr');
+
+                if (name.includes(query) || abbr.includes(query)) {
+                    item.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    item.classList.add('hidden');
+                }
+            }
+            document.getElementById(`count-${key}`).textContent = visibleCount;
+            noResultsMessage.style.display = (visibleCount === 0) ? 'block' : 'none';
+        }
+    }
+
+    function updateCounters() {
+        for (const key of Object.keys(datasets)) {
+            const container = document.getElementById(`list-${key}`);
+            const total = container.getElementsByClassName('list-item').length;
+            document.getElementById(`count-${key}`).textContent = total;
+        }
+    }
+
+    document.getElementById('searchBar').addEventListener('input', filterLists);
+    document.getElementById('clearBtn').addEventListener('click', () => {
+        const searchBar = document.getElementById('searchBar');
+        searchBar.value = '';
+        filterLists();
+        searchBar.focus();
+    });
+
+    initLists();
+
+    // REGISTER SERVICE WORKER FOR INSTALLABILITY
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker Registered!', reg))
+                .catch(err => console.log('Service Worker Registration Failed', err));
+        });
+    }
+</script>
+</body>
+</html>
