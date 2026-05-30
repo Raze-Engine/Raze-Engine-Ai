@@ -11,7 +11,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AddrAbbr">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/9131/9131546.png">
-    
     <meta name="theme-color" content="#0969da">
 
     <style>
@@ -23,6 +22,7 @@
             --text-muted: #57606a;
             --primary-blue: #0969da;
             --hover-bg: #f3f4f6;
+            --success-green: #1a7f37;
         }
 
         body {
@@ -32,7 +32,6 @@
             margin: 0;
             padding: 20px;
             line-height: 1.5;
-            /* Prevents rubber-banding bounce on iOS */
             overscroll-behavior-y: contain; 
         }
 
@@ -45,18 +44,41 @@
             margin-bottom: 24px;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
-        h1 {
+        .header-main h1 {
             font-size: 24px;
             font-weight: 600;
             margin: 0 0 8px 0;
         }
 
-        p.subtitle {
+        .header-main p.subtitle {
             color: var(--text-muted);
             margin: 0;
             font-size: 14px;
+        }
+
+        /* Offline Status Badge Style */
+        .status-badge {
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 2em;
+            background-color: #eaeef2;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .status-badge.ready {
+            background-color: #dafbe1;
+            color: var(--success-green);
+            border-color: #8ce1a7;
         }
 
         .search-container {
@@ -76,7 +98,7 @@
         input[type="text"] {
             flex-grow: 1;
             padding: 8px 12px;
-            font-size: 16px; /* 16px prevents automatic zoom on iOS Safari */
+            font-size: 16px;
             line-height: 20px;
             color: var(--text-color);
             background-color: var(--card-bg);
@@ -198,8 +220,11 @@
 
 <div class="container">
     <header>
-        <h1>Address Component Abbreviations</h1>
-        <p class="subtitle">Quick-reference tool for Street Suffixes, Secondary Units, States, and Directionals</p>
+        <div class="header-main">
+            <h1>Address Component Abbreviations</h1>
+            <p class="subtitle">Quick-reference tool for Street Suffixes, Secondary Units, States, and Directionals</p>
+        </div>
+        <div id="offlineStatus" class="status-badge">Saving for offline...</div>
     </header>
 
     <div class="search-container">
@@ -385,12 +410,34 @@
 
     initLists();
 
-    // REGISTER SERVICE WORKER FOR INSTALLABILITY
+    // SERVICE WORKER & OFFLINE BADGE CODE
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('Service Worker Registered!', reg))
-                .catch(err => console.log('Service Worker Registration Failed', err));
+                .then(reg => {
+                    const badge = document.getElementById('offlineStatus');
+                    
+                    // Check if already cached on previous visits
+                    if (reg.active) {
+                        badge.textContent = '✓ Available Offline';
+                        badge.classList.add('ready');
+                    }
+
+                    // Watch for assets finishes downloading the first time
+                    reg.addEventListener('updatefound', () => {
+                        const installingWorker = reg.installing;
+                        installingWorker.addEventListener('statechange', () => {
+                            if (installingWorker.state === 'activated') {
+                                badge.textContent = '✓ Available Offline';
+                                badge.classList.add('ready');
+                            }
+                        });
+                    });
+                })
+                .catch(err => {
+                    console.error('Service Worker registration failed:', err);
+                    document.getElementById('offlineStatus').textContent = 'Offline unavailable';
+                });
         });
     }
 </script>
