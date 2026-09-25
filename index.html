@@ -12,30 +12,31 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f3f4f6;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-purple-500 selection:text-white">
+<body class="text-slate-900 min-h-screen flex flex-col justify-between selection:bg-purple-600 selection:text-white">
 
     <div class="max-w-2xl w-full mx-auto px-4 py-8 flex flex-col gap-6">
         
         <!-- Header Title -->
         <header class="text-center">
-            <h1 class="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-purple-400 via-fuchsia-300 to-pink-400 bg-clip-text text-transparent">
+            <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">
                 Daily Tracker Dashboard
             </h1>
-            <p class="text-xs text-slate-400 mt-1">Record and manage your daily GSR & XM counts</p>
+            <p class="text-xs text-slate-500 mt-1">Record and manage your daily GSR & XM counts</p>
         </header>
 
-        <!-- TOP UI: Gradient Violet Dashboard Cards -->
+        <!-- TOP UI: Gradient Violet Dashboard Cards matching the reference image theme -->
         <section class="grid grid-cols-2 gap-4">
             <!-- Total XM Card -->
-            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-600 via-purple-700 to-indigo-900 p-6 shadow-xl shadow-purple-950/50 border border-purple-500/30 flex flex-col justify-between">
-                <div class="absolute -right-6 -bottom-6 text-white/10 text-7xl font-black pointer-events-none">
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-700 via-purple-600 to-indigo-800 p-6 shadow-xl shadow-purple-900/20 text-white flex flex-col justify-between">
+                <div class="absolute -right-4 -bottom-4 text-white/10 text-7xl font-black pointer-events-none">
                     <i class="fa-solid fa-bolt"></i>
                 </div>
                 <div>
-                    <span class="text-xs font-semibold uppercase tracking-wider text-purple-200/80">Total XM</span>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-purple-200">Total XM</span>
                 </div>
                 <div class="mt-4">
                     <h2 id="totalXM" class="text-4xl font-extrabold tracking-tight text-white">0</h2>
@@ -43,12 +44,12 @@
             </div>
 
             <!-- Total GSR Card -->
-            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-fuchsia-600 via-purple-700 to-pink-900 p-6 shadow-xl shadow-fuchsia-950/50 border border-fuchsia-500/30 flex flex-col justify-between">
-                <div class="absolute -right-6 -bottom-6 text-white/10 text-7xl font-black pointer-events-none">
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-800 via-indigo-700 to-purple-900 p-6 shadow-xl shadow-purple-900/20 text-white flex flex-col justify-between">
+                <div class="absolute -right-4 -bottom-4 text-white/10 text-7xl font-black pointer-events-none">
                     <i class="fa-solid fa-chart-pie"></i>
                 </div>
                 <div>
-                    <span class="text-xs font-semibold uppercase tracking-wider text-fuchsia-200/80">Total GSR</span>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-purple-200">Total GSR</span>
                 </div>
                 <div class="mt-4">
                     <h2 id="totalGSR" class="text-4xl font-extrabold tracking-tight text-white">0</h2>
@@ -57,40 +58,40 @@
         </section>
 
         <!-- MAIN INTERACTIVE UI: Only 2 Buttons & Input Form -->
-        <main class="bg-slate-900/80 backdrop-blur-md rounded-2xl border border-slate-800 p-6 shadow-2xl flex flex-col gap-6">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
-                <h2 class="text-sm font-semibold tracking-wide text-slate-300 uppercase">Log Entry</h2>
-                <span id="currentDateDisplay" class="text-xs text-slate-400 font-medium"></span>
+        <main class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xl shadow-slate-200/50 flex flex-col gap-6">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                <h2 class="text-sm font-semibold tracking-wide text-slate-700 uppercase">Log Entry</h2>
+                <span id="currentDateDisplay" class="text-xs text-slate-500 font-medium"></span>
             </div>
 
             <form id="trackerForm" onsubmit="handleSubmit(event)" class="flex flex-col gap-5">
                 <!-- Date Picker -->
                 <div class="flex flex-col gap-1.5">
-                    <label for="entryDate" class="text-xs font-medium text-slate-400">Select Date</label>
+                    <label for="entryDate" class="text-xs font-medium text-slate-600">Select Date</label>
                     <input type="date" id="entryDate" required
-                        class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all">
+                        class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 transition-all">
                 </div>
 
                 <!-- Quantity Input -->
                 <div class="flex flex-col gap-1.5">
-                    <label for="entryAmount" class="text-xs font-medium text-slate-400">Amount / Quantity</label>
+                    <label for="entryAmount" class="text-xs font-medium text-slate-600">Amount / Quantity</label>
                     <input type="number" id="entryAmount" min="1" placeholder="e.g. 5" required
-                        class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all">
+                        class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 transition-all">
                 </div>
 
                 <!-- THE ONLY 2 BUTTONS: GSR and XM -->
                 <div class="flex flex-col gap-2 pt-2">
-                    <span class="text-xs font-medium text-slate-400">Choose type to record:</span>
+                    <span class="text-xs font-medium text-slate-600">Choose type to record:</span>
                     <div class="grid grid-cols-2 gap-3">
                         <button type="button" onclick="submitEntry('XM')" 
-                            class="group relative flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-violet-900/40 active:scale-[0.98] transition-all">
-                            <i class="fa-solid fa-bolt text-violet-200 group-hover:scale-110 transition-transform"></i>
+                            class="group relative flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white font-bold text-sm shadow-md shadow-purple-700/20 active:scale-[0.98] transition-all">
+                            <i class="fa-solid fa-bolt text-purple-200 group-hover:scale-110 transition-transform"></i>
                             Log XM
                         </button>
                         
                         <button type="button" onclick="submitEntry('GSR')" 
-                            class="group relative flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-white font-bold text-sm shadow-lg shadow-fuchsia-900/40 active:scale-[0.98] transition-all">
-                            <i class="fa-solid fa-chart-pie text-fuchsia-200 group-hover:scale-110 transition-transform"></i>
+                            class="group relative flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-gradient-to-r from-indigo-700 to-purple-800 hover:from-indigo-800 hover:to-purple-900 text-white font-bold text-sm shadow-md shadow-indigo-700/20 active:scale-[0.98] transition-all">
+                            <i class="fa-solid fa-chart-pie text-indigo-200 group-hover:scale-110 transition-transform"></i>
                             Log GSR
                         </button>
                     </div>
@@ -99,16 +100,16 @@
         </main>
 
         <!-- Database History / Logs Table -->
-        <section class="bg-slate-900/50 backdrop-blur-md rounded-2xl border border-slate-800/80 p-5 flex flex-col gap-4">
+        <section class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col gap-4">
             <div class="flex items-center justify-between">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Recent Database Logs</h3>
-                <button onclick="clearDatabase()" class="text-[11px] text-red-400 hover:text-red-300 transition-colors font-medium">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Recent Database Logs</h3>
+                <button onclick="clearDatabase()" class="text-[11px] text-red-500 hover:text-red-700 transition-colors font-medium">
                     <i class="fa-solid fa-trash-can mr-1"></i> Clear Data
                 </button>
             </div>
             <div class="overflow-x-auto max-h-48 overflow-y-auto pr-1">
-                <table class="w-full text-left text-xs text-slate-300">
-                    <thead class="text-slate-500 uppercase font-semibold border-b border-slate-800 sticky top-0 bg-slate-900/90 backdrop-blur">
+                <table class="w-full text-left text-xs text-slate-700">
+                    <thead class="text-slate-400 uppercase font-semibold border-b border-slate-100 sticky top-0 bg-white backdrop-blur">
                         <tr>
                             <th class="pb-2">Date</th>
                             <th class="pb-2">Type</th>
@@ -116,11 +117,11 @@
                             <th class="pb-2 text-right">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="logsTableBody" class="divide-y divide-slate-800/50">
+                    <tbody id="logsTableBody" class="divide-y divide-slate-100">
                         <!-- Dynamic rows injected here -->
                     </tbody>
                 </table>
-                <div id="emptyState" class="text-center py-6 text-slate-500 text-xs hidden">
+                <div id="emptyState" class="text-center py-6 text-slate-400 text-xs hidden">
                     No records found in database yet.
                 </div>
             </div>
@@ -129,8 +130,8 @@
     </div>
 
     <!-- Footer -->
-    <footer class="text-center py-4 text-[11px] text-slate-600">
-        Local Database Storage Active &bull; Gradient Violet UI
+    <footer class="text-center py-4 text-[11px] text-slate-400">
+        Local Database Storage Active &bull; Violet & Clean White Theme
     </footer>
 
     <!-- JavaScript Application Logic -->
@@ -208,17 +209,17 @@
                     }
 
                     const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-slate-800/40 transition-colors';
+                    tr.className = 'hover:bg-slate-50 transition-colors';
                     tr.innerHTML = `
-                        <td class="py-2.5 font-medium text-slate-300">${item.date}</td>
+                        <td class="py-2.5 font-medium text-slate-700">${item.date}</td>
                         <td class="py-2.5">
-                            <span class="px-2 py-0.5 rounded-md font-bold text-[10px] ${item.type === 'XM' ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30' : 'bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/30'}">
+                            <span class="px-2 py-0.5 rounded-md font-bold text-[10px] ${item.type === 'XM' ? 'bg-purple-100 text-purple-700 border border-purple-200' : 'bg-indigo-100 text-indigo-700 border border-indigo-200'}">
                                 ${item.type}
                             </span>
                         </td>
-                        <td class="py-2.5 text-right font-semibold text-slate-200">+${item.amount}</td>
+                        <td class="py-2.5 text-right font-semibold text-slate-800">+${item.amount}</td>
                         <td class="py-2.5 text-right">
-                            <button onclick="deleteRecord(${item.id})" class="text-slate-500 hover:text-red-400 transition-colors px-1">
+                            <button onclick="deleteRecord(${item.id})" class="text-slate-400 hover:text-red-500 transition-colors px-1">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         </td>
