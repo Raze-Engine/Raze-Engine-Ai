@@ -415,7 +415,7 @@
 ‎        window.addEventListener('load', () => {
 ‎            navigator.serviceWorker.register('./sw.js')
 ‎                .then(reg => {
-‎               a     const badge = document.getElementById('offlineStatus');
+‎                    const badge = document.getElementById('offlineStatus');
 ‎                    
 ‎                    // Check if already cached on previous visits
 ‎                    if (reg.active) {
@@ -443,3 +443,4 @@
 ‎</script>
 ‎</body>
 ‎</html>
+‎
